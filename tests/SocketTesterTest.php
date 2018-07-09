@@ -147,16 +147,26 @@ class SocketTesterTest extends TestCase
     }
 
     /** @test */
-    public function detectsUnbufferedWriteLimit()
+    public function pollutesSocketWithDataUntilPipeIsFull()
     {
         $this->doNotBufferSockets();
 
-        $writeLimit = $this->socketTester->detectWriteLimit();
+        $this->socketTester->polluteSocket();
 
-        $bytesWritten = @fwrite($this->remoteSocket, str_repeat('a', $writeLimit + 100));
-
-        $this->assertEquals($writeLimit, $bytesWritten);
+        $this->assertEquals(0, @fwrite($this->localSocket, 'Data'));
     }
+
+    /** @test */
+    public function drainsSocketThatWasPolluted()
+    {
+        $this->doNotBufferSockets();
+
+        $this->socketTester->polluteSocket();
+        $this->socketTester->drainPollutedSocket();
+
+        $this->assertEquals(4, fwrite($this->localSocket, 'Data'));
+    }
+
 
     /** @test */
     public function allowsClosingRemoteSocketForTesting()

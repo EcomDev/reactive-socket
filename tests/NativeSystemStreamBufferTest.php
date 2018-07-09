@@ -182,48 +182,30 @@ class NativeSystemStreamBufferTest extends TestCase
 
 
     /** @test */
-    public function batchesWritesWhenBufferIsBiggerThanAmountWrittenToRemote()
+    public function batchesWritesForLaterWhenRemoteIsFull()
     {
-        $osWriteLimit = $this->socket->detectWriteLimit();
+        $streamBuffer = $this->createStreamBuffer();
+        $this->socket->polluteSocket();
 
-        $streamBuffer = $this->createStreamBufferWithWriteBufferSize(
-            $osWriteLimit * 2
-        );
+        $streamBuffer->write('Some data #1');
+        $streamBuffer->write('Some data #2');
 
-        $streamBuffer->write(str_repeat('a', $osWriteLimit * 2));
+        $this->socket->polluteSocket();
         $streamBuffer->writeToRemote();
-        $this->socket->readRemoteIntoBuffer();
-        $streamBuffer->writeToRemote();
-        $this->socket->readRemoteIntoBuffer();
-        $this->socket->assertRemoteReadBuffer([
-            str_repeat('a', $osWriteLimit),
-            str_repeat('a', $osWriteLimit)
-        ]);
-    }
+        $this->socket->drainPollutedSocket();
 
-    /** @test */
-    public function reportsRemoteAsNotFullWhenJustEnoughBytesWrittenButNotOverflowing()
-    {
-        $osWriteLimit = $this->socket->detectWriteLimit();
-
-        $streamBuffer = $this->createStreamBufferWithWriteBufferSize($osWriteLimit * 2);
-
-        $streamBuffer->write(str_repeat('a', $osWriteLimit));
         $streamBuffer->writeToRemote();
 
-        $this->assertFalse($streamBuffer->isRemoteFull());
+        $this->socket->assertRemoteContent('Some data #1Some data #2');
     }
 
     /** @test */
     public function reportsRemoteAsFullWhenPipeIsFull()
     {
-        $osWriteLimit = $this->socket->detectWriteLimit();
+        $streamBuffer = $this->createStreamBuffer();
+        $this->socket->polluteSocket();
 
-        $streamBuffer = $this->createStreamBufferWithWriteBufferSize(
-            $osWriteLimit * 2
-        );
-
-        $streamBuffer->write(str_repeat('a', $osWriteLimit + 1));
+        $streamBuffer->write('Some data');
         $streamBuffer->writeToRemote();
 
         $this->assertTrue($streamBuffer->isRemoteFull());
@@ -232,15 +214,12 @@ class NativeSystemStreamBufferTest extends TestCase
     /** @test */
     public function reportsRemoteNotFullWhenDataWasDrainedOnRemote()
     {
-        $osWriteLimit = $this->socket->detectWriteLimit();
+        $streamBuffer = $this->createStreamBuffer();
 
-        $streamBuffer = $this->createStreamBufferWithWriteBufferSize(
-            $osWriteLimit * 2
-        );
-
-        $streamBuffer->write(str_repeat('a', $osWriteLimit + 1));
+        $this->socket->polluteSocket();
+        $streamBuffer->write('Some data');
         $streamBuffer->writeToRemote();
-        $this->socket->readRemoteIntoBuffer();
+        $this->socket->drainPollutedSocket();
         $streamBuffer->writeToRemote();
 
         $this->assertFalse($streamBuffer->isRemoteFull());
@@ -340,20 +319,26 @@ class NativeSystemStreamBufferTest extends TestCase
     /** @test */
     public function returnsPartiallyNotWrittenDataOnDisconnect()
     {
-        $writeSize = $this->socket->detectWriteLimit() * 2;
+        $streamBuffer = $this->createStreamBuffer();
 
-        $streamBuffer = $this->createStreamBufferWithWriteBufferSize($writeSize);
-
-        $streamBuffer->write(str_repeat('0', $writeSize));
+        $streamBuffer->write('Data written before pollution');
         $streamBuffer->writeToRemote();
+        $this->socket->polluteSocket();
+        $streamBuffer->write('Data not written because of pollution');
+        $streamBuffer->writeToRemote();
+        $streamBuffer->write('Data written after write to remote');
+
         $this->socket->closeRemote();
         $streamBuffer->writeToRemote();
 
         $this->socket = null;
 
-        $streamBuffer->notifyConnectionClosedOrBroken(function ($data) use ($writeSize) {
+        $streamBuffer->notifyConnectionClosedOrBroken(function ($data) {
             $this->assertEquals(
-                [str_repeat('0', $writeSize)],
+                [
+                    'Data not written because of pollution',
+                    'Data written after write to remote'
+                ],
                 $data
             );
         });
@@ -452,5 +437,17 @@ class NativeSystemStreamBufferTest extends TestCase
         return function () {
             $this->disconnected = true;
         };
+    }
+
+
+    private function writeUntilLimitIsReached(StreamBuffer $streamBuffer, int $writeLimit, int $chunkSize = 4096): void
+    {
+        while ($writeLimit > 0) {
+            $size = min($chunkSize, $writeLimit);
+            $streamBuffer->write(str_repeat('a', $size));
+            $writeLimit -= $size;
+        }
+
+        $streamBuffer->write(str_repeat('a', 1));
     }
 }

@@ -43,9 +43,9 @@ class SocketTester
         Assert::assertEquals($expectedValue, stream_get_contents($this->verifyStream, strlen($expectedValue)));
     }
 
-    public function readRemoteIntoBuffer()
+    public function readRemoteIntoBuffer(int $readSize = 10*1024)
     {
-        $this->readBuffer[] = fread($this->verifyStream, 10*1024);
+        $this->readBuffer[] = fread($this->verifyStream, $readSize);
     }
 
     public function release()
@@ -75,25 +75,31 @@ class SocketTester
         Assert::assertEquals($expectedBuffer, $this->readBuffer);
     }
 
+    public function polluteSocket()
+    {
+        $dataSize = 4096;
+        $writtenSize = 0;
+        do {
+            $bytesWritten = @fwrite($this->socketUnderTest, \random_bytes($dataSize));
+            $writtenSize += $bytesWritten;
+        } while ($bytesWritten > 0);
+    }
+
+    public function drainPollutedSocket()
+    {
+        $this->drainSocket($this->verifyStream);
+    }
+
     private function drainSocket($stream): void
     {
         do {
-            $readData = fread($stream, 1024);
+            $readData = fread($stream, 4096);
         } while ($readData !== '');
     }
 
     private function makeVerifyStreamAsync(): void
     {
         stream_set_blocking($this->verifyStream, false);
-    }
-
-    public function detectWriteLimit()
-    {
-        $dataSize = 100000;
-        $writtenSize = @fwrite($this->verifyStream, str_repeat('0', $dataSize));
-        fread($this->socketUnderTest, $writtenSize);
-
-        return $writtenSize;
     }
 
     public function closeLocal()
