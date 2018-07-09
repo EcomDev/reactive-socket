@@ -1,0 +1,21 @@
+version: "2"
+plugins:
+  phpcodesniffer:
+    enabled: true
+    config:
+      standard: "PSR1,PSR2"
+  phpmd:
+    enabled: true
+    config:
+      rulesets: phpmd.ruleset.xml
+  duplication:
+    enabled: true
+    config:
+      languages:
+        - php
+  git-legal:
+    enabled: true
+  sonar-php:
+    enabled: true
+exclude_patterns:
+  - 'tests/'
