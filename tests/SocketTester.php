@@ -89,7 +89,7 @@ class SocketTester
 
     public function detectWriteLimit()
     {
-        $dataSize = 10000;
+        $dataSize = 100000;
         $writtenSize = @fwrite($this->verifyStream, str_repeat('0', $dataSize));
         fread($this->socketUnderTest, $writtenSize);
 
