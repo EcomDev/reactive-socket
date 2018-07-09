@@ -104,15 +104,15 @@ class SocketStreamBuffer implements StreamBuffer
         $this->catchSocketErrors(function () {
             while (!$this->writeBuffer->isEmpty()) {
                 $data = $this->writeBuffer->currentValue();
-                $size = fwrite($this->stream, $data);
+                $writtenBytes = fwrite($this->stream, $data);
 
-                $this->isRemoteFull = $size < strlen($data);
+                $this->isRemoteFull = $writtenBytes < strlen($data);
 
-                if ($size === false || $size === 0) {
+                if ($writtenBytes === false || $writtenBytes === 0) {
                     break;
                 }
 
-                $this->writeBuffer->handleWrittenBytes($size);
+                $this->writeBuffer->handleWrittenBytes($writtenBytes);
             }
         });
     }
