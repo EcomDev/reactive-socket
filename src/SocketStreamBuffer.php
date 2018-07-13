@@ -98,6 +98,7 @@ class SocketStreamBuffer implements StreamBuffer
             }
         });
     }
+
     /** {@inheritdoc} */
     public function writeToRemote(): void
     {

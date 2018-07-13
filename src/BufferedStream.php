@@ -21,6 +21,9 @@ class BufferedStream implements Stream
     /** @var string[] */
     private $unsentData = [];
 
+    /** @var bool */
+    private $streamIsBroken = false;
+
     public function __construct(StreamBuffer $streamBuffer)
     {
         $this->streamBuffer = $streamBuffer;
@@ -63,12 +66,18 @@ class BufferedStream implements Stream
 
     private function detachFromAllEmittersWhenConnectionIsBroken(): void
     {
+        if ($this->streamIsBroken) {
+            return;
+        }
+
         $this->streamBuffer->notifyConnectionClosedOrBroken(function ($unsentData) {
+            $this->streamIsBroken = true;
+
+            $this->unsentData = $unsentData;
+
             foreach ($this->attachedEmitters as $emitter) {
                 $this->streamBuffer->detachResourceFromEmitter($this, $emitter);
             }
-
-            $this->unsentData = $unsentData;
         });
     }
 }

@@ -21,21 +21,21 @@ interface EventEmitterBuilder
     /**
      * Adds an observer that handles I/O events on sockets
      */
-    public function withStreamObserver(StreamObserver $streamHandler): self;
+    public function addStreamObserver(StreamObserver $streamObserver): self;
 
     /**
      * Invoked when system after all I/O events processed in a single loop run
      *
      * A good example of usage is doing some slow blocking action based on queued list of tasks
      */
-    public function withWorker(callable $worker): self;
+    public function addWorker(callable $worker): self;
 
     /**
-     * Invoked when system does not perform any socket I/O operations
+     * Invoked when system does not have incoming I/O events
      *
-     * A good example of task added here is cleaning up cache based on access time
+     * A good example of task added here is cleaning up hot in memory cache, syncing data to disc, etc
      */
-    public function withIdleWorker(callable $worker): self;
+    public function addIdleWorker(callable $worker): self;
 
     /**
      * Builds an event emitter

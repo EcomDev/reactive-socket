@@ -438,16 +438,4 @@ class NativeSystemStreamBufferTest extends TestCase
             $this->disconnected = true;
         };
     }
-
-
-    private function writeUntilLimitIsReached(StreamBuffer $streamBuffer, int $writeLimit, int $chunkSize = 4096): void
-    {
-        while ($writeLimit > 0) {
-            $size = min($chunkSize, $writeLimit);
-            $streamBuffer->write(str_repeat('a', $size));
-            $writeLimit -= $size;
-        }
-
-        $streamBuffer->write(str_repeat('a', 1));
-    }
 }

@@ -212,12 +212,31 @@ class BufferedStreamTest extends TestCase
         );
     }
 
+    /** @test */
+    public function doesNotLooseUnsentDataWhenMultipleNotification()
+    {
+        $this->streamBuffer->write('Data #1');
+        $this->streamBuffer->write('Data #2');
+        $this->streamBuffer->close();
+
+        $observer = $this->createObserver();
+
+        $this->stream->notifyReadable($observer);
+        $this->stream->notifyWritable($observer);
+        $this->stream->notifyDisconnected($observer);
+
+        $this->assertEquals(
+            StreamObserverNotificationState::createEmpty()
+                ->withReadableNotification($this->stream, '')
+                ->withDisconnectedNotification($this->stream, ['Data #1', 'Data #2']),
+            $observer->fetchNotifications()
+        );
+    }
 
     private function createObserverWithWrite($data): FakeStreamObserver
     {
         return $this->createObserver()->withWrite($data);
     }
-
 
     private function overflowPipeBuffer(string $data): void
     {

@@ -11,5 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `FakeStreamObserver` and `StreamObserverNotificationState` for testing custom implementation of buffers, streams and event emitters
 - `InMemoryStreamBuffer` and `SocketStreamBuffer` provide implementation for `StreamClient`, but hidden behind observer 
 - `BufferedStream` that utilizes `StreamBuffer` as an abstraction of stream resource
+- `StreamSelectEventEmitter` and `StreamSelectEventEmitter` for simple zero dependency socket server implementations
+- `SimpleLoopRunner` for easy testing of event loop in socket applications
 
 [Unreleased]: https://github.com/ecomdev/reactive-socket/compare/4b825dc642cb6eb9a060e54bf8d69288fbee4904...HEAD

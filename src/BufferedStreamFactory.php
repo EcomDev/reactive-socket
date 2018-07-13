@@ -8,6 +8,9 @@ declare(strict_types=1);
 
 namespace EcomDev\ReactiveSocket;
 
+/**
+ * Creates buffered stream
+ */
 class BufferedStreamFactory
 {
     public function createFromBuffer(StreamBuffer $streamBuffer): Stream
