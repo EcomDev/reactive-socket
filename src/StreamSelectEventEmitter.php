@@ -54,6 +54,8 @@ class StreamSelectEventEmitter implements EventEmitter
 
     /**
      * Executed on every tick by event loop
+     *
+     * @internal
      */
     public function __invoke()
     {

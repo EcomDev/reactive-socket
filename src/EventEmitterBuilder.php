@@ -24,7 +24,7 @@ interface EventEmitterBuilder
     public function addStreamObserver(StreamObserver $streamObserver): self;
 
     /**
-     * Invoked when system after all I/O events processed in a single loop run
+     * Invoked when after all I/O events processed, can be next loop run
      *
      * A good example of usage is doing some slow blocking action based on queued list of tasks
      */
