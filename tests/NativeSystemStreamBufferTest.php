@@ -345,7 +345,7 @@ class NativeSystemStreamBufferTest extends TestCase
     }
 
     /** @test */
-    public function notifiesOfDisconnectOnlyWhenConnectionIsBrokenConnection()
+    public function notifiesOfDisconnectOnlyWhenConnectionIsBroken()
     {
         $streamBuffer = $this->createStreamBuffer();
 

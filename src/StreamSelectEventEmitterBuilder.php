@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace EcomDev\ReactiveSocket;
 
-/**  */
+/** Stream select based event emitter */
 class StreamSelectEventEmitterBuilder implements EventEmitterBuilder
 {
     /**
@@ -26,6 +26,7 @@ class StreamSelectEventEmitterBuilder implements EventEmitterBuilder
      */
     private $idleWorkers = [];
 
+    /** @var StreamObserver[] */
     private $streamObservers = [];
 
     public function __construct(LoopRunner $loopRunner)
