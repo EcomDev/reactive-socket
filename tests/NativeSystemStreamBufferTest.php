@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace EcomDev\ReactiveSocket;
 
+use EcomDev\SocketTester\SocketTester;
+use EcomDev\SocketTester\SocketTesterPool;
 use PHPUnit\Framework\TestCase;
 
 class NativeSystemStreamBufferTest extends TestCase
@@ -429,7 +431,7 @@ class NativeSystemStreamBufferTest extends TestCase
 
     private function createStreamBufferThroughTester(SocketStreamBufferFactory $factory): StreamBuffer
     {
-        return $this->socket->createSystemBuffer([$factory, 'createFromSocket']);
+        return $this->socket->wrapSocket([$factory, 'createFromSocket']);
     }
 
     private function disconnectNotification(): callable

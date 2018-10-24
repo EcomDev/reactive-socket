@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Removed
+- `SocketTester` and `SocketTesterPool` from tests in favor of re-usable `ecomdev/socket-tester` package
+
 ## [1.1.0]
 ### Added
 - `FakeStreamClient` for easier testing in third-party implementations

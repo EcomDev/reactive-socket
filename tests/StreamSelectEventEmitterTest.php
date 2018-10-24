@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace EcomDev\ReactiveSocket;
 
+use EcomDev\SocketTester\SocketTester;
+use EcomDev\SocketTester\SocketTesterPool;
 use PHPUnit\Framework\TestCase;
 
 class StreamSelectEventEmitterTest extends TestCase
@@ -301,6 +303,6 @@ class StreamSelectEventEmitterTest extends TestCase
     {
         $socket = $socket ?? $this->createSocket();
 
-        return $socket->createSystemBuffer([new SocketStreamBufferFactory(), 'createFromSocket']);
+        return $socket->wrapSocket([new SocketStreamBufferFactory(), 'createFromSocket']);
     }
 }
