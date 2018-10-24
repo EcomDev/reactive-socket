@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.1.1]
 ### Removed
 - `SocketTester` and `SocketTesterPool` from tests in favor of re-usable `ecomdev/socket-tester` package
 
@@ -30,7 +31,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `StreamSelectEventEmitter` and `StreamSelectEventEmitter` for simple zero dependency socket server implementations
 - `SimpleLoopRunner` for easy testing of event loop in socket applications
 
-[Unreleased]: https://github.com/ecomdev/reactive-socket/compare/1.1.0...HEAD
+[Unreleased]: https://github.com/ecomdev/reactive-socket/compare/1.1.1...HEAD
+[1.1.1]: https://github.com/ecomdev/reactive-socket/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/ecomdev/reactive-socket/compare/1.0.1...1.1.0
 [1.0.1]: https://github.com/ecomdev/reactive-socket/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/ecomdev/reactive-socket/compare/4b825dc642cb6eb9a060e54bf8d69288fbee4904...1.0.0
